@@ -1,7 +1,7 @@
 function love.conf(config)
-	config.title = "Kubicle"    
-	config.screen.width = 1920;
-	config.screen.height = 1080;
+	config.title = "Metro Tetris"    
+	config.screen.width = 1280;
+	config.screen.height = 768;
 end
 
 game_config = {
@@ -35,5 +35,10 @@ game_config = {
 			button_back = 9,
 			axis_update = 0.1
 		}
+	},
+	display = {
+		full_screen = false,
+		width = 1280,
+		height = 768
 	}
 }
