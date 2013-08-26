@@ -16,3 +16,10 @@ Development
 
 When everything turns out nice an OUYA-Version will be published
 
+Credits
+-------
+
+- Loveframes: Kenny Shields
+- tween.lua: Enrique Garcia Cota
+- Adore64 Font: ck! [Freeky Fonts]
+- Made with [[http://love2d.org|Lone Star State]] 
