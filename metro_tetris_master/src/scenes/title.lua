@@ -17,7 +17,7 @@ local options_cursor = 1;
 
 local config_value = nil;
 
-local function error_frame(text)
+local function error_frame(message)
 	state = -1; -- error state
 	local frame = loveframes.Create("frame")
 	frame:SetModal(true);
@@ -29,7 +29,7 @@ local function error_frame(text)
 	end
 	local text = loveframes.Create("text", frame)
 	text:SetMaxWidth(400)
-	text:SetText(text); -- + "\nPress Escape to exit")
+	text:SetText(message);
 	text:SetParent(frame);
 	text:SetPos(5, 30)
 	local button = loveframes.Create("button", frame)
@@ -90,6 +90,45 @@ function load_menu()
 		{name = "Back", value = 0, onSelect = function() options = config_options; options_cursor = 1; config_value = nil; end},	
 	}
 	
+	local function getFullscreenItemName()
+		if (config.display.full_screen == true) then
+			return "Toggle Window Mode"
+		else
+			return "Toggle Fullscreen"
+		end
+	end
+	
+	local modes = love.graphics.getModes();
+	local mode_index = #modes;
+	
+	gfx_options = {
+		{
+			name = getFullscreenItemName(), 
+			onSelect = function() 
+				config.display.full_screen = not config.display.full_screen; 
+				love.graphics.toggleFullscreen(); 
+				gfx_options[1].name = getFullscreenItemName()
+			end 
+		},
+		{
+			name = "Resolution = " .. modes[mode_index].width .. "x" .. modes[mode_index].height, 
+			onSelect = function()
+				config.display.width = modes[mode_index].width;
+				config.display.height = modes[mode_index].height;
+				love.graphics.setMode(modes[mode_index].width, modes[mode_index].height, config.display.full_screen)
+			end,
+			onValueUp = function()
+				if (mode_index > 1) then mode_index = mode_index - 1; end
+				gfx_options[2].name = "Resolution = " .. modes[mode_index].width .. "x" .. modes[mode_index].height
+			end,
+			onValueDown = function()
+				if (mode_index < #modes) then mode_index = mode_index + 1; end
+				gfx_options[2].name = "Resolution = " .. modes[mode_index].width .. "x" .. modes[mode_index].height
+			end
+		},
+		{name = "Back", value = 0, onSelect = function() options = config_options; options_cursor = 1; end}
+	}
+	
 	gamepad_options = {
 		{name = "Gamepad 1", value = 0, onSelect = function() end},
 		
@@ -107,6 +146,7 @@ function load_menu()
 	}
 	
 	config_options = {
+		{name = "Graphics", value = 0, onSelect = function() options = gfx_options end},
 		{name = "Audio", value = 0, onSelect = function() options = audio_options end},
 		{name = "Configure Gamepads", value = 0, onSelect = function() options = gamepad_options; options_cursor = 1; end},
 		{name = "Save Configuration", value = 0, onSelect = function() 
