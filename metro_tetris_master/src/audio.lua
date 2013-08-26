@@ -9,6 +9,7 @@ local config = {}
 
 function AudioManager:init(game_config)
 	config = game_config;
+	love.audio.setVolume(config.sound_volume)
 end
 
 function AudioManager:loadSound(name, source)
