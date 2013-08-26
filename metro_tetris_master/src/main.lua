@@ -59,15 +59,22 @@ current_scene = TitleScene;
 network_state = 0;
 
 function love.load()
-	-- LOAD L…VE2D-related LIBRARIES
+	-- LOAD Lï¿½VE2D-related LIBRARIES
 	require("lib.loveframes")
 
 	if (love.filesystem.exists( "config.metro" )) then
 		local file = love.filesystem.newFile("config.metro")
 		file:open("r")
 		local data = file:read();
-		game_config = Tserial.unpack(data);
+		local_config = Tserial.unpack(data);
 		file:close();
+		-- add missing configurations
+		for k,v in pairs(game_config) do
+			if (local_config[k] == nil) then
+				local_config[k] = v;
+			end
+		end
+		game_config = local_config;
 	end
 
 	game_font = love.graphics.newFont("assets/Adore64.ttf", 16);
@@ -101,7 +108,13 @@ function love.load()
 	--game_over_music:setLooping(true);
 	
 	connection = initNetwork(game_config.server.ip, game_config.server.port, 0.2);
-    
+	
+	love.graphics.setMode(game_config.display.width, game_config.display.height)
+	
+	if (game_config.display.full_screen == true) then
+		love.graphics.toggleFullscreen();
+	end
+	
     current_scene.onLoad(game_config);
     
 end
