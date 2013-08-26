@@ -1,7 +1,7 @@
 Metro Tetris
 ============
 
-A tetras clone with network play and fancy new play modes.
+A tetris clone with network play and fancy new play modes.
 Optimized for gamepads.
 
 Yet not playable
