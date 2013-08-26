@@ -22,4 +22,4 @@ Credits
 - Loveframes: Kenny Shields
 - tween.lua: Enrique Garcia Cota
 - Adore64 Font: ck! [Freeky Fonts]
-- Made with [[http://love2d.org|Lone Star State]] 
+- Made with Löve2D http://love2d.org
