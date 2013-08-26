@@ -54,7 +54,7 @@ local base_options = {};
 
 function load_menu()
 	 singleplayer_options = {
-		{name = "Survival", value = 0, onSelect = function() end},
+		{name = "Survival", value = 0, onSelect = function() game_config.set_game_state(2); end},
 		{name = "Mode A", value = 0, onSelect = function() error_frame("Not implemented.") end},
 		{name = "Mode B", value = 0, onSelect = function() error_frame("Not implemented.") end},
 		{name = "Back", valie = 0, onSelect = function() options = base_options; options_cursor = 1; end}
@@ -152,7 +152,7 @@ function load_menu()
 		{name = "Save Configuration", value = 0, onSelect = function() 
 			local file = love.filesystem.newFile("config.metro")
 			file:open("w")
-			local data = Tserial.pack(config);
+			local data = Tserial.pack(config, function() return "function" end);
 			file:write(data, #data);
 			file:close()
 		end},
@@ -194,7 +194,7 @@ local background_color = {
 	r = 255,
 	g = 255,
 	b = 255,
-	a = 255
+	a = 0
 }
 
 local wallpaper_color = {
@@ -208,9 +208,9 @@ local wallpaper_color = {
 local block_joy = {x = 0, y = 0}
 
 local function create_fancy_tween()
-	tween.start(5, wallpaper_color, {r = math.random(128, 256)}, "linear");
-	tween.start(5, wallpaper_color, {g = math.random(128, 256)}, "linear");
-	tween.start(5, wallpaper_color, {b = math.random(128, 256)}, "linear", function() create_fancy_tween() end);
+	tween.start(5, wallpaper_color, {r = math.random(0, 256)}, "linear");
+	tween.start(5, wallpaper_color, {g = math.random(0, 256)}, "linear");
+	tween.start(5, wallpaper_color, {b = math.random(0, 256)}, "linear", function() create_fancy_tween() end);
 end
 
 function TitleScene.onLoad(game_config)
@@ -232,6 +232,10 @@ function TitleScene.onLoad(game_config)
 	load_menu();
 	
 	create_fancy_tween();
+	
+	tween.start(3, background_color, {a = 255}, "inQuad", function() 
+		tween.start(3, background_color, {a = 0}, "outQuad", function() state = 2; end);
+	end)
 	
 end
 
@@ -296,14 +300,13 @@ function TitleScene.onDraw()
 
 	if (state < 2) then
 		love.graphics.setColor(background_color.r, background_color.g, background_color.b, background_color.a)
-		love.graphics.draw(background, 0, 0, 0, background_scale_x, background_scale_y);
-		if (state == 0) then 
-			love.graphics.setColor(255, 255, 255, 255);
-			love.graphics.printf("Press any key", love.graphics.getWidth() / 2 - 150, love.graphics.getHeight() / 2, 300, "center")
-		end
+		-- love.graphics.draw(background, 0, 0, 0, background_scale_x, background_scale_y);
+		love.graphics.printf("Dead City games", love.graphics.getWidth() / 2 - 150, love.graphics.getHeight() / 2 - 24, 300, "center")
+		love.graphics.printf("presents", love.graphics.getWidth() / 2 - 150, love.graphics.getHeight() / 2, 300, "center")
+		
 	end
 	
-	if (state == 2) then
+	if (state == 2 or state == -1) then
 		love.graphics.setColor(wallpaper_color.r, wallpaper_color.g, wallpaper_color.b, wallpaper_color.a)
 		love.graphics.draw(background2, 0, 0, 0, background_scale_x, background_scale_y);
 		love.graphics.setColor(255, 255, 255, 255);
@@ -345,7 +348,7 @@ function TitleScene.onJoystickpressed(joy, key)
 		option_select(key);
 	end
 	
-	if (state == -1) then
+	if (state == -1 and key == config.gamepad[joy].button_start) then
 		loveframes.util.RemoveAll()
 		state = 2;
 	end
@@ -386,4 +389,8 @@ function TitleScene.joystick()
 			if (y > 0) then option_down(); end
 		end
 	end
+end
+
+function TitleScene.onExit()
+	AudioManager:stopMusic()
 end

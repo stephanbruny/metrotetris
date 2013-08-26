@@ -1,4 +1,4 @@
-require("stone_data");
+require("stones_data");
 
 Stone = {}
 

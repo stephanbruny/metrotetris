@@ -4,6 +4,7 @@ require("lib.tserial.tserial")
 
 
 require("scenes.title")
+require("scenes.singleplayer")
 
 require("conf")
 
@@ -58,6 +59,11 @@ current_scene = TitleScene;
 -- -1 - LET ME ALONE
 network_state = 0;
 
+local scenes = {
+	TitleScene,
+	SingleplayerScene
+}
+
 function love.load()
 	-- LOAD L�VE2D-related LIBRARIES
 	require("lib.loveframes")
@@ -75,6 +81,16 @@ function love.load()
 			end
 		end
 		game_config = local_config;
+	end
+	
+	-- setup game state change callback
+	game_config.game_state = 0; -- title screen
+	game_config.set_game_state = function(state)
+		if (state == game_config.game_state) then return; end -- do nothing if state did not change
+		current_scene.onExit();
+		current_scene = scenes[state];
+		game_config.game_state = state;
+		current_scene.onLoad(game_config);
 	end
 
 	game_font = love.graphics.newFont("assets/Adore64.ttf", 16);

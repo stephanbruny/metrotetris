@@ -2,12 +2,13 @@ Field = {}
 
 function Field.new(width, height)
 	-- initialize field with 0
+	local data = {}
 	for i = 1, width * height do data[i] = 0; end
 	
 	return {
 		width = width,
 		height = height,
-		data = {}
+		data = data
 	}
 end
 
@@ -21,17 +22,17 @@ function Field.serialize(field)
     return result;
 end
 
-function Field.draw(field, stone_size)
+function Field.draw(field, stone_size, x, y)
 	for i = 1, field.width do
 	    for j = 1, field.height do 
 			love.graphics.setColor(255, 255, 255, 64);
 			if (field.data[i * field.height + j] == 0) then 
-				love.graphics.rectangle("line", i * stone_size, j *  stone_size,  stone_size,  stone_size )
+				love.graphics.rectangle("line", x + i * stone_size, y + j *  stone_size,  stone_size,  stone_size )
 			end
 			
 			if (field.data[i * field.height + j] == 1) then 
 				love.graphics.setColor(200, 200, 200, 128);
-			    love.graphics.rectangle("fill", i * stone_size, j *  stone_size,  stone_size,  stone_size )
+			    love.graphics.rectangle("fill", x + i * stone_size, y + j *  stone_size,  stone_size,  stone_size )
 			end
 		end
 	end

@@ -32,7 +32,7 @@ function AudioManager:playMusic(source, loop)
 	Music = new_music;
 end
 
-function AudioManager:stopMusic(source, loop)
+function AudioManager:stopMusic()
 	if (Music ~= nil) then
 		love.audio.stop(Music);
 	end
