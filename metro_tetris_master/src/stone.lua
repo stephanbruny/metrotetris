@@ -2,6 +2,8 @@ require("stones_data");
 
 Stone = {}
 
+local game_field = {}
+
 sample_stone = {
 	data = {},
 	rotation = 0,
@@ -9,12 +11,15 @@ sample_stone = {
 	y = 0
 }
 
-function Stone.new()
+function Stone.new(field)
+	
+	game_field = field;
+	
 	next_stone = {};
 	next_stone.y = 0;
 	next_stone.rot = 1;
-	next_stone.x = math.floor(game_config.field_width / 2) - 1;
-	next_stone.pattern = STONES[math.random(1, #stones)];
+	next_stone.x = math.floor(game_field.width / 2) - 1;
+	next_stone.pattern = STONES[math.random(1, #STONES)];
 	next_stone.data = next_stone.pattern[1];
 	next_stone.color = {
 		r = math.random(128,255),
@@ -24,20 +29,20 @@ function Stone.new()
 	return next_stone;
 end
 
-function Stone.update_stone(stone)
+function Stone.update_stone(stone, onCollision)
 	for x = 1, #stone.data do
 		for y = 1, #stone.data[x] do
 			if (stone.data[x][y] > 0) then
-				if (stone.y + y >= game_config.field_height) then
-					make_solid(stone);
+				if (stone.y + y >= game_field.height) then
+					onCollision(stone);
 					return false;
 				end
 				
-				if (check_field(stone.x + x, stone.y + y + 1) > 0) then
+				if (Field.get(game_field, stone.x + x, stone.y + y + 1) > 0) then
 					if (stone.y + y < 2) then
 						game_over();
 					end
-					make_solid(stone);
+					onCollision(stone);
 					return false;
 				end
 			end
@@ -58,8 +63,8 @@ function Stone.move_stone(stone, dir, field)
 	for x = 1, #stone.data do
 		for y = 1, #stone.data[x] do
 			if (stone.data[x][y] > 0) then
-				if (dir == 1 and stone.x + x >= game_config.field_width) then return end;
-				if (check_field(stone.x + x + dir, stone.y + y) > 0) then
+				if (dir == 1 and stone.x + x >= game_field.width) then return end;
+				if (Field.get(game_field, stone.x + x + dir, stone.y + y) > 0) then
 					return;
 				end
 			end
@@ -98,15 +103,15 @@ function Stone.rotate_stone(stone, dir)
 	for x = 1, #stone.data do
     if (stone.data[x] == nil) then return false; end
 		for y = 1, #stone.data[x] do
-			if (stone.x + x > game_config.field_width) then
+			if (stone.x + x > game_field.width) then
 				stone.x = stone.x - 1;
 			end
 			
-			if (stone.y + y > game_config.field_height) then
+			if (stone.y + y > game_field.height) then
 				stone.y = stone.y - 1;
 			end
 			
-			if (check_field(stone.x + x, stone.y + y) > 0) then
+			if (Field.get(game_field, stone.x + x, stone.y + y) > 0) then
 				stone.data = stone.pattern[old_rot];
 				stone.rot = old_rot;
 			end

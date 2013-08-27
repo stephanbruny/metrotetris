@@ -140,8 +140,8 @@ function game_over()
 	gameover_anim = 0;
 	row_cursor = game_config.field_height;
 	AudioManager:playSound("lose");
-	love.audio.stop(game_music)
-	love.audio.play(game_over_music);
+	--love.audio.stop(game_music)
+	--love.audio.play(game_over_music);
 end
 
 function createField(width, height)
@@ -203,7 +203,7 @@ function love.draw()
 	  
 		-- DRAW GAME OVER SCREEN
 		if (game_state == 0) then
-			draw_field();
+--			draw_field();
 			love.graphics.setColor(0,0,0,200);
 	    	love.graphics.printf("GAME OVER\nPress 'r' for new game", love.graphics.getWidth() / 2 - 75 + 2, 300 + 2, 150, "center");
 	    	love.graphics.setColor(255,255,255,255);
@@ -356,7 +356,8 @@ end
 
 function love.update(delta_time)
 	loveframes.update(delta_time);
-	if (game_state == 8) then
+	current_scene.onUpdate(delta_time)
+	--[[if (game_state == 8) then
 		current_scene.onUpdate(delta_time)
 	else
 		handle_joystick();
@@ -427,7 +428,7 @@ function love.update(delta_time)
 			end
 			
 		end
-	end
+	end--]]
 end
 
 function love.keypressed(key)
