@@ -63,7 +63,11 @@ function Stone.move_stone(stone, dir)
 	for x = 1, #stone.data do
 		for y = 1, #stone.data[x] do
 			if (stone.data[x][y] > 0) then
+<<<<<<< HEAD
 				if (dir == 1 and stone.x + x >= game_field.width - 1) then return end;
+=======
+				if (dir == 1 and stone.x + x >= game_field.width) then return end;
+>>>>>>> a84870f093b5153313392435695c3882cd455895
 				if (Field.get(game_field, stone.x + x + dir, stone.y + y) > 0) then
 					return;
 				end
@@ -103,7 +107,11 @@ function Stone.rotate_stone(stone, dir)
 	for x = 1, #stone.data do
     if (stone.data[x] == nil) then return false; end
 		for y = 1, #stone.data[x] do
+<<<<<<< HEAD
 			if (stone.x + x > game_field.width - 1) then
+=======
+			if (stone.x + x > game_field.width) then
+>>>>>>> a84870f093b5153313392435695c3882cd455895
 				stone.x = stone.x - 1;
 			end
 			
