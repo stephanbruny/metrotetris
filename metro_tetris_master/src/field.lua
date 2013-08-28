@@ -70,7 +70,7 @@ function Field.check_rows(field, on_row_callback)
 			-- clear row
 			for w = 1, field.width do
 				Field.set(field, w, row, 0);
-				on_row_callback();
+				-- on_row_callback();
 				-- todo: place in callback
 				--[[score = score + 10 * score_multiplier;
 				

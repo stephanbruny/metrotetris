@@ -2,6 +2,7 @@ function love.conf(config)
 	config.title = "Metro Tetris"    
 	config.screen.width = 1280;
 	config.screen.height = 768;
+	config.identity = "metrotetris";
 end
 
 game_config = {

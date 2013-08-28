@@ -8,7 +8,7 @@ SingleplayerScene = {}
 local state = 1;
 
 local field_width = 11;
-local field_height = 20;
+local field_height = 21;
 local block_size = 32;
 local offsetX, offsetY = 0, 0;
 local field = {}
@@ -20,6 +20,21 @@ local block_timer = 0;
 
 local current_block = {}
 local next_block = {}
+
+local scores = {
+	40,
+	120,
+	300,
+	1200
+}
+
+local player_score = 0;
+
+local block_colors = {
+	{r = 255, g = 255, b = 255, a = 200},
+	{r = 255, g = 200, b = 0, a = 200},
+	{r = 255, g = 0, b = 200, a = 200}
+}
 
 local function start_game()
 	state = 2;
@@ -37,6 +52,7 @@ end
 
 function SingleplayerScene.onLoad(conf)
 	field = Field.new(field_width, field_height);
+	print(Tserial.pack(field));
 	offsetX = love.graphics.getWidth() / 2 - (field_width / 2 * block_size) - block_size;
 	offsetY = love.graphics.getHeight() / 2 - (field_height / 2 * block_size) - block_size;
 	blink_ready();
@@ -44,7 +60,26 @@ function SingleplayerScene.onLoad(conf)
 end
 
 function SingleplayerScene.onDraw()
-	Field.draw(field, 32, offsetX, offsetY);
+	-- Field.draw(field, 32, offsetX, offsetY);
+	
+	for i = 1, field.width do
+	    for j = 1, field.height do 
+			love.graphics.setColor(255, 255, 255, 64);
+			if (field.data[i * field.height + j] == 0) then 
+				love.graphics.rectangle("line", offsetX + i * block_size, offsetY + j *  block_size,  block_size,  block_size )
+			end
+			
+			if (field.data[i * field.height + j] == 1) then 
+				love.graphics.setColor(200, 200, 200, 128);
+			    love.graphics.rectangle("fill", offsetX + i * block_size, offsetY + j *  block_size,  block_size,  block_size )
+			end
+			
+			if (field.data[i * field.height + j] == -1) then 
+				love.graphics.setColor(255, 200, 200, blink.alpha);
+			    love.graphics.rectangle("fill", offsetX + i * block_size, offsetY + j *  block_size,  block_size,  block_size )
+			end
+		end
+	end
 	
 	love.graphics.setColor(0,0,255,200);
 	love.graphics.setLine(2, "smooth");
@@ -55,7 +90,7 @@ function SingleplayerScene.onDraw()
 		love.graphics.printf("Ready?", love.graphics.getWidth() / 2, love.graphics.getHeight() / 2 - 24, 0, "center", 200)
 	end	
 	
-	if (state == 2) then
+	if (state >= 2 and state <= 4) then
 		if (current_block ~= nil) then
 			local offsetBlockX = offsetX + current_block.x * block_size;
 			local offsetBlockY = offsetY + current_block.y * block_size;
@@ -66,9 +101,12 @@ function SingleplayerScene.onDraw()
 						love.graphics.setColor(current_block.color.r, current_block.color.g, current_block.color.b, 255);
 						love.graphics.rectangle("fill", offsetBlockX + x * block_size, offsetBlockY + y *  block_size,  block_size,  block_size )
 					end
+					
 				end
 			end
 		end
+		love.graphics.setColor(255,255,255,255);
+		love.graphics.print("Score: " .. player_score, 5, 5);
 	end
 end
 
@@ -98,11 +136,19 @@ function SingleplayerScene.onUpdate(dt)
 				for k,v in pairs(current_block.color) do
 					origCol[k] = v;
 				end 
+				state = 3;
 				tween.start(0.05, current_block.color, {r = 255, b = 255, g = 255}, "inQuad", function() 
 					tween.start(0.05, current_block.color, {r = origCol.r, b = origCol.b, g = origCol.g}, "inQuad", function() 
 						-- make solid
 						make_solid(current_block)
+						local rows = 0;
+						while Field.check_rows(field) do rows = rows +1; end
+						if (rows > 0) then
+							player_score = player_score + scores[rows];
+							rows = 0;
+						end
 						create_next_block();
+						state = 2;
 					end);
 				end) 
 			end);
@@ -116,6 +162,26 @@ function SingleplayerScene.onKeypressed(key)
 		if (state == 1) then 
 			start_game(); 
 		end;
+	end
+	
+	if (state == 2) then
+		if (current_block ~= nil) then
+			if (key == "left") then
+				Stone.move_stone(current_block, -1, field);
+			end
+			
+			if (key == "right") then
+				Stone.move_stone(current_block, 1, field);
+			end
+			
+			if (key == "up") then
+				Stone.rotate_stone(current_block, -1);
+			end
+			
+			if (key == "down") then
+				block_timer = update_interval;
+			end
+		end
 	end
 end
 

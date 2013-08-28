@@ -55,7 +55,7 @@ end
 -- dir can be -1 or 1
 -- 0 left
 -- 1 right
-function Stone.move_stone(stone, dir, field)
+function Stone.move_stone(stone, dir)
 	local canMove = 1;
 	
 	if (dir == -1 and stone.x == 0) then return; end
@@ -63,7 +63,7 @@ function Stone.move_stone(stone, dir, field)
 	for x = 1, #stone.data do
 		for y = 1, #stone.data[x] do
 			if (stone.data[x][y] > 0) then
-				if (dir == 1 and stone.x + x >= game_field.width) then return end;
+				if (dir == 1 and stone.x + x >= game_field.width - 1) then return end;
 				if (Field.get(game_field, stone.x + x + dir, stone.y + y) > 0) then
 					return;
 				end
@@ -103,7 +103,7 @@ function Stone.rotate_stone(stone, dir)
 	for x = 1, #stone.data do
     if (stone.data[x] == nil) then return false; end
 		for y = 1, #stone.data[x] do
-			if (stone.x + x > game_field.width) then
+			if (stone.x + x > game_field.width - 1) then
 				stone.x = stone.x - 1;
 			end
 			
