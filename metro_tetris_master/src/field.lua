@@ -46,8 +46,18 @@ function Field.set(field, x, y, value)
 	field.data[ x * field.height + y ] = value;
 end
 
+function Field.check_row_complete(field, row)
+	local complete = true;
+	for x = 1, field.width - 1 do
+		if (Field.get(field, x, row) <= 0) then
+			complete = false;
+		end
+	end
+	return complete;
+end
+
 function Field.move_rows_down(field, row)
-	for x = 1, field.width do
+	for x = 1, field.width - 1 do
 		Field.set(field, x, row, Field.get(field, x, row - 1));
 	end
 	
@@ -56,20 +66,21 @@ function Field.move_rows_down(field, row)
 	end
 end
 
-function Field.check_rows(field, on_row_callback) 
+function Field.check_rows(field) 
 	for y = 1, field.height do
 		local complete = true;
 		local row = field.height - (y - 1);
-		for x = 1, field.width do
-			if (Field.get(field, x, row) == 0) then
+		for x = 1, field.width - 1 do
+			if (Field.get(field, x, row) <= 0) then
 				complete = false;
 			end
 		end
 		
 		if (true == complete) then
 			-- clear row
-			for w = 1, field.width do
-				Field.set(field, w, row, 0);
+			for w = 1, field.width - 1 do
+				Field.set(field, w, row, -1);
+				
 				-- on_row_callback();
 				-- todo: place in callback
 				--[[score = score + 10 * score_multiplier;
@@ -85,11 +96,9 @@ function Field.check_rows(field, on_row_callback)
 					life = 0.5;
 				};--]]
 			end
-			
-			Field.move_rows_down(field, row)
-			return true;
+			return row;
 		end
 		
 	end
-	return false;
+	return nil;
 end

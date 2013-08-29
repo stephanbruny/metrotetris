@@ -36,6 +36,13 @@ local block_colors = {
 	{r = 255, g = 0, b = 200, a = 200}
 }
 
+local row_color = {
+	r = 200, 
+	g = 200, 
+	b = 200, 
+	a = 255,
+}
+
 local function start_game()
 	state = 2;
 	current_block = Stone.new(field);
@@ -141,11 +148,26 @@ function SingleplayerScene.onUpdate(dt)
 					tween.start(0.05, current_block.color, {r = origCol.r, b = origCol.b, g = origCol.g}, "inQuad", function() 
 						-- make solid
 						make_solid(current_block)
-						local rows = 0;
-						while Field.check_rows(field) do rows = rows +1; end
-						if (rows > 0) then
-							player_score = player_score + scores[rows];
-							rows = 0;
+						local rows = {};
+						
+						local next_row = Field.check_rows(field);
+						local ri = 1;
+						while next_row ~= nil
+							do 
+								rows[ri] = next_row;
+								ri = ri + 1; 
+								next_row = Field.check_rows(field);
+						end
+						
+						
+						if (#rows > 0) then
+							
+							tween.start(0.5, {r=1}, {r=0}, "linear", function()
+								for i = 0, #rows - 1 do
+									Field.move_rows_down(field, rows[#rows - i]);
+								end
+								player_score = player_score + scores[#rows];
+							end);
 						end
 						create_next_block();
 						state = 2;
